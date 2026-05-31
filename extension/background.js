@@ -108,6 +108,14 @@ function controlVideoInPage(action) {
     }
 
     case 'fullscreen': {
+      // Prefer Plyr's own fullscreen button when present — it knows how to put
+      // the whole player (not just the bare <video>) into fullscreen.
+      const plyrFs = document.querySelector('button[data-plyr="fullscreen"]');
+      if (plyrFs) {
+        plyrFs.click();
+        return true;
+      }
+
       if (!video) return false;
       try {
         if (document.fullscreenElement) {
@@ -134,10 +142,16 @@ function controlVideoInPage(action) {
     }
 
     case 'next': {
-      // "Next episode" is site-specific. We try a few common patterns:
-      //   1. A link/button whose text says "next".
-      //   2. Common player "next" control classes.
-      // This is best-effort and easy to tweak if WatchSoMuch changes their UI.
+      // WatchSoMuch's Plyr player has a dedicated "Next Episode" button — use it
+      // first since it's the most reliable.
+      const wsmNext = document.querySelector('#btnNextEpisode, #btnNextEpisodeBig');
+      if (wsmNext) {
+        wsmNext.click();
+        return true;
+      }
+
+      // Otherwise fall back to common "next" patterns. Best-effort and easy to
+      // tweak if WatchSoMuch changes their UI.
       const candidates = Array.from(
         document.querySelectorAll('a, button, [role="button"], .jw-icon-next, .next, .btn-next, .next-episode')
       );
@@ -168,20 +182,43 @@ function controlVideoInPage(action) {
     case 'speed-1.5':
     case 'speed-2': {
       // Action looks like "speed-1.5" → take the number after the dash.
-      if (!video) return false;
       const rate = parseFloat(action.split('-')[1]);
-      if (!isNaN(rate)) video.playbackRate = rate;
-      return true;
+      if (isNaN(rate)) return false;
+
+      // WatchSoMuch uses the Plyr player. Plyr exposes a preset for each speed
+      // as <button data-plyr="speed" value="1.5">. Clicking it routes the change
+      // through Plyr so the new speed STICKS (setting video.playbackRate directly
+      // can get reset by the player while it buffers) and the menu stays in sync.
+      const speedButtons = Array.from(document.querySelectorAll('button[data-plyr="speed"]'));
+      const match = speedButtons.find((b) => parseFloat(b.value) === rate);
+      if (match) {
+        match.click();
+        return true;
+      }
+
+      // No preset for this exact speed (e.g. 1.25× isn't in Plyr's default list),
+      // so set it straight on the media element.
+      if (video) {
+        video.playbackRate = rate;
+        return true;
+      }
+      return false;
     }
 
     case 'captions': {
       // Toggle subtitles/closed-captions on or off.
       //
-      // The standard way is via the video's text tracks: each track has a
-      // `mode` of 'showing' | 'hidden' | 'disabled'. If any track is currently
-      // showing we turn them all off; otherwise we turn the best track on.
-      const tracks = video && video.textTracks ? Array.from(video.textTracks) : [];
+      // WatchSoMuch's Plyr player renders captions itself, so flipping the native
+      // <track>.mode doesn't work — we have to use Plyr's own caption toggle
+      // button. Clicking it turns subtitles on/off just like pressing "C".
+      const plyrCc = document.querySelector('button[data-plyr="captions"]');
+      if (plyrCc) {
+        plyrCc.click();
+        return true;
+      }
 
+      // Fallback for non-Plyr players: toggle the native text tracks directly.
+      const tracks = video && video.textTracks ? Array.from(video.textTracks) : [];
       if (tracks.length > 0) {
         const anyShowing = tracks.some((t) => t.mode === 'showing');
         if (anyShowing) {
@@ -195,8 +232,7 @@ function controlVideoInPage(action) {
         return true;
       }
 
-      // Fallback: no text tracks exposed, so click the player's own CC button.
-      // This is best-effort and easy to tweak if WatchSoMuch changes their UI.
+      // Last resort: click any caption-looking button in the page.
       const ccCandidates = Array.from(
         document.querySelectorAll(
           'button, [role="button"], .jw-icon-cc, .vjs-subs-caps-button, .captions, .subtitle, [class*="caption"], [class*="subtitle"]'

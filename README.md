@@ -180,9 +180,11 @@ All commands are simple action strings shared by the UI, server, and extension:
 `playpause`, `seek-back`, `seek-forward`, `next`, `fullscreen`,
 `speed-1`, `speed-1.25`, `speed-1.5`, `speed-2`, and `captions`.
 
-Speed actions set `video.playbackRate`; `captions` toggles the video's text
-tracks (falling back to clicking the player's own CC button if no tracks are
-exposed).
+Speed actions drive WatchSoMuch's Plyr player: they click its preset speed
+button (`button[data-plyr="speed"]`) so the change sticks, falling back to
+`video.playbackRate` for speeds with no preset (e.g. 1.25×). `captions` clicks
+Plyr's caption toggle (`button[data-plyr="captions"]`), falling back to the
+native text tracks for non-Plyr players.
 
 ---
 
