@@ -38,7 +38,18 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 let commandQueue = [];
 
 // Commands the controller is allowed to send. Anything else is rejected.
-const VALID_ACTIONS = ['playpause', 'seek-back', 'seek-forward', 'next', 'fullscreen'];
+const VALID_ACTIONS = [
+  'playpause',
+  'seek-back',
+  'seek-forward',
+  'next',
+  'fullscreen',
+  'speed-1',
+  'speed-1.25',
+  'speed-1.5',
+  'speed-2',
+  'captions',
+];
 
 // Map file extensions to the Content-Type we should send back.
 const MIME_TYPES = {

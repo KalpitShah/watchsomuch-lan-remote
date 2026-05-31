@@ -163,6 +163,64 @@ function controlVideoInPage(action) {
       return false;
     }
 
+    case 'speed-1':
+    case 'speed-1.25':
+    case 'speed-1.5':
+    case 'speed-2': {
+      // Action looks like "speed-1.5" → take the number after the dash.
+      if (!video) return false;
+      const rate = parseFloat(action.split('-')[1]);
+      if (!isNaN(rate)) video.playbackRate = rate;
+      return true;
+    }
+
+    case 'captions': {
+      // Toggle subtitles/closed-captions on or off.
+      //
+      // The standard way is via the video's text tracks: each track has a
+      // `mode` of 'showing' | 'hidden' | 'disabled'. If any track is currently
+      // showing we turn them all off; otherwise we turn the best track on.
+      const tracks = video && video.textTracks ? Array.from(video.textTracks) : [];
+
+      if (tracks.length > 0) {
+        const anyShowing = tracks.some((t) => t.mode === 'showing');
+        if (anyShowing) {
+          tracks.forEach((t) => { t.mode = 'hidden'; });
+        } else {
+          // Prefer an actual subtitles/captions track over, say, a metadata one.
+          const target =
+            tracks.find((t) => t.kind === 'subtitles' || t.kind === 'captions') || tracks[0];
+          target.mode = 'showing';
+        }
+        return true;
+      }
+
+      // Fallback: no text tracks exposed, so click the player's own CC button.
+      // This is best-effort and easy to tweak if WatchSoMuch changes their UI.
+      const ccCandidates = Array.from(
+        document.querySelectorAll(
+          'button, [role="button"], .jw-icon-cc, .vjs-subs-caps-button, .captions, .subtitle, [class*="caption"], [class*="subtitle"]'
+        )
+      );
+      const ccEl = ccCandidates.find((el) => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        const aria = (el.getAttribute('aria-label') || '').toLowerCase();
+        const title = (el.getAttribute('title') || '').toLowerCase();
+        const cls = (el.className || '').toString().toLowerCase();
+        return (
+          text === 'cc' ||
+          aria.includes('caption') || aria.includes('subtitle') ||
+          title.includes('caption') || title.includes('subtitle') ||
+          cls.includes('caption') || cls.includes('subtitle') || cls.includes('cc')
+        );
+      });
+      if (ccEl) {
+        ccEl.click();
+        return true;
+      }
+      return false;
+    }
+
     default:
       return false;
   }

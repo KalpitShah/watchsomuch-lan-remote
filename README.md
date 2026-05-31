@@ -3,9 +3,10 @@
 Control the WatchSoMuch video player on your **laptop** from your **phone**, over your
 local network (home Wi‑Fi **or** a mobile hotspot).
 
-Tap **Play/Pause**, seek **±10s**, jump to the **next episode**, or toggle
-**fullscreen** — all from a clean, dark remote in your phone's browser. No app
-store, no accounts, nothing leaves your network.
+Tap **Play/Pause**, seek **±10s**, change **playback speed** (1.25× / 1.5× / 2×),
+toggle **captions**, jump to the **next episode**, or go **fullscreen** — all from
+a clean, dark remote in your phone's browser. No app store, no accounts, nothing
+leaves your network.
 
 ```
  ┌──────────────┐    POST /command     ┌──────────────┐    GET /poll     ┌──────────────────┐
@@ -96,10 +97,10 @@ http://[laptop-ip]:3000
 
 ### 7. Use the controller 🎉
 
-Tap the big button to **play/pause**, use **−10s / +10s** to seek, **Next Episode**
-to skip ahead, and **Fullscreen** to toggle fullscreen. The little dot at the
-bottom turns **green** when a command was delivered and **red** if it couldn't
-reach the server.
+Tap the big button to **play/pause**, use **−10s / +10s** to seek, pick a
+**playback speed** (1×, 1.25×, 1.5×, 2×), toggle **Captions** on/off, jump to the
+**Next Episode**, or toggle **Fullscreen**. The little dot at the bottom turns
+**mint** when a command was delivered and **red** if it couldn't reach the server.
 
 ---
 
@@ -176,7 +177,12 @@ moves to a brand‑new domain, add it in two places and reload the extension:
   alive / restarts the loop if Chrome puts it to sleep.
 
 All commands are simple action strings shared by the UI, server, and extension:
-`playpause`, `seek-back`, `seek-forward`, `next`, `fullscreen`.
+`playpause`, `seek-back`, `seek-forward`, `next`, `fullscreen`,
+`speed-1`, `speed-1.25`, `speed-1.5`, `speed-2`, and `captions`.
+
+Speed actions set `video.playbackRate`; `captions` toggles the video's text
+tracks (falling back to clicking the player's own CC button if no tracks are
+exposed).
 
 ---
 

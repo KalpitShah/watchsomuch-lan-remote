@@ -1,7 +1,12 @@
 /* ============================================================
    WatchSoMuch Remote — controller logic
-   Pure vanilla JS. Each button tap POSTs a command to the relay
-   server, and we show whether it was delivered in the status bar.
+   ------------------------------------------------------------
+   Each button tap POSTs a command to the relay server and the status
+   bar reflects whether it was delivered. Two controls also keep a little
+   local UI state for nicer feedback:
+     • the speed segmented control highlights the chosen speed, and
+     • the captions bar flips an on/off switch.
+   Pure vanilla JS.
    ============================================================ */
 
 (function () {
@@ -13,8 +18,9 @@
 
   const statusEl = document.getElementById('status');
   const statusText = document.getElementById('statusText');
+  const ccBtn = document.getElementById('ccBtn');
 
-  // Holds the timer that resets the status back to "Ready" after a moment.
+  // Timer that resets the status back to "Ready" after a moment.
   let resetTimer = null;
 
   /**
@@ -31,8 +37,8 @@
   }
 
   /**
-   * Give a button a brief visual "tapped" highlight, in addition to the CSS
-   * :active state (which only lasts while the finger is down).
+   * Give a button a brief "tapped" highlight on top of the CSS :active state
+   * (which only lasts while the finger is held down).
    */
   function flash(button) {
     button.classList.add('tapped');
@@ -41,7 +47,7 @@
 
   /**
    * Send a command to the relay server.
-   * @param {string} action  one of: playpause, seek-back, seek-forward, next, fullscreen
+   * @param {string} action  e.g. playpause, seek-back, speed-1.5, captions …
    */
   async function sendCommand(action) {
     setStatus('sending', 'Sending…');
@@ -51,26 +57,44 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action }),
       });
-
       if (!res.ok) throw new Error('Server responded ' + res.status);
-
-      setStatus('ok', 'Sent ✓');
+      setStatus('ok', 'Sent');
     } catch (err) {
       // Most common cause: the laptop server isn't reachable (wrong IP, firewall,
-      // not on the same network). Tell the user plainly.
+      // not on the same network).
       setStatus('err', 'Not connected — is the server running?');
     } finally {
-      // Fade the status back to a neutral "Ready" after a short delay so the
-      // indicator doesn't get stuck on a stale message.
       clearTimeout(resetTimer);
       resetTimer = setTimeout(() => setStatus('idle', 'Ready'), 1800);
     }
   }
 
-  // Wire up every button that has a data-action attribute.
-  document.querySelectorAll('.btn[data-action]').forEach((button) => {
+  /**
+   * For grouped controls (the speed segments), mark the tapped button as the
+   * single active one within its group.
+   */
+  function setActiveInGroup(button) {
+    const group = button.dataset.group;
+    document
+      .querySelectorAll(`[data-group="${group}"]`)
+      .forEach((el) => el.classList.toggle('is-active', el === button));
+  }
+
+  // Wire up every button that carries a data-action.
+  document.querySelectorAll('[data-action]').forEach((button) => {
     button.addEventListener('click', () => {
       flash(button);
+
+      // Segmented control: update the highlighted selection.
+      if (button.dataset.group) setActiveInGroup(button);
+
+      // Captions toggle: flip the on/off switch optimistically. The extension
+      // toggles the real captions; if they ever drift, another tap re-syncs.
+      if (button === ccBtn) {
+        const on = ccBtn.classList.toggle('is-on');
+        ccBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+
       sendCommand(button.dataset.action);
     });
   });

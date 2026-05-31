@@ -1,28 +1,42 @@
 /* ============================================================
    WatchSoMuch Remote — styles
-   Dark theme, high-contrast buttons, smooth tap animations.
+   ------------------------------------------------------------
+   Design system:
+     • Dark neutral base (near-black with a cool tint).
+     • ONE primary colour  → violet  (#6E5BF2)  — the main, energetic action.
+     • ONE secondary colour → mint    (#1FD2A6)  — "on" / active / success states.
+   Everything else is neutral grey so the two colours carry the design.
    Pure CSS, no frameworks.
    ============================================================ */
 
 :root {
-  --bg-top: #11142a;
-  --bg-bottom: #070810;
-  --accent: #5b7cff;        /* primary blue/purple accent */
-  --accent-glow: #7c5bff;
-  --play-a: #ff5b8a;        /* play button gradient */
-  --play-b: #ff8a3d;
-  --surface: #1a1e36;       /* button background */
-  --surface-hi: #232844;    /* button background (pressed/hover) */
-  --text: #f2f4ff;
-  --text-dim: #8a90b8;
-  --ok: #3ddc84;
-  --err: #ff5b6e;
-  --radius: 20px;
+  /* Neutrals */
+  --bg:        #0B0C11;
+  --bg-soft:   #14161F;
+  --surface:   #161924;   /* default control background */
+  --surface-2: #1F2433;   /* pressed / raised */
+  --line:      rgba(255, 255, 255, 0.07);
+  --line-soft: rgba(255, 255, 255, 0.04);
+  --text:      #ECEEF6;
+  --text-dim:  #767D96;
+
+  /* Brand — exactly two colours */
+  --primary:      #6E5BF2;
+  --primary-bright:#8B7CFF;
+  --secondary:    #1FD2A6;
+  --secondary-bright:#3BE7C0;
+
+  /* Derived tints */
+  --primary-glow:   rgba(110, 91, 242, 0.45);
+  --secondary-glow: rgba(31, 210, 166, 0.40);
+
+  --radius:    18px;
+  --radius-lg: 22px;
 }
 
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent; /* remove ugly grey flash on mobile */
+  -webkit-tap-highlight-color: transparent; /* no grey flash on mobile tap */
 }
 
 html, body {
@@ -31,9 +45,13 @@ html, body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
-  background: radial-gradient(120% 90% at 50% 0%, var(--bg-top) 0%, var(--bg-bottom) 70%);
+  /* Subtle primary/secondary aura bleeding in from the top corners. */
+  background:
+    radial-gradient(70% 55% at 85% -5%, rgba(31, 210, 166, 0.10), transparent 60%),
+    radial-gradient(85% 60% at 15% -10%, rgba(110, 91, 242, 0.18), transparent 60%),
+    var(--bg);
   min-height: 100%;
   display: flex;
   justify-content: center;
@@ -43,181 +61,303 @@ body {
 
 .remote {
   width: 100%;
-  max-width: 460px;
-  padding: 28px 22px 24px;
+  max-width: 440px;
+  padding: 22px 20px 22px;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+
+/* ---- Header ------------------------------------------------------------- */
+
+.header {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.brand {
+  display: inline-flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
+  color: var(--text);
+  font-size: 1.05rem;
+  letter-spacing: 0.2px;
 }
 
-.title {
-  margin: 6px 0 8px;
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-glow));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-align: center;
+.brand strong { color: var(--primary-bright); font-weight: 700; }
+.brand-text { font-weight: 500; opacity: 0.95; }
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(140deg, var(--primary), var(--primary-bright));
+  box-shadow: 0 6px 16px var(--primary-glow);
 }
 
-/* ---- Generic button look & tap feedback -------------------------------- */
+/* ---- Shared press feedback --------------------------------------------- */
 
-.btn {
+button {
+  font-family: inherit;
   border: none;
   outline: none;
-  color: var(--text);
-  background: var(--surface);
-  border-radius: var(--radius);
-  font-family: inherit;
   cursor: pointer;
   user-select: none;
-  /* Smooth scale + shadow animation on tap. */
-  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-}
-
-/* The brief highlight + squish when a button is pressed. */
-.btn:active,
-.btn.tapped {
-  transform: scale(0.94);
-  background: var(--surface-hi);
+  color: var(--text);
+  transition: transform 0.12s ease, background 0.16s ease, box-shadow 0.16s ease,
+    border-color 0.16s ease, color 0.16s ease;
 }
 
 /* ---- The big Play / Pause button --------------------------------------- */
 
-.btn-play {
-  width: 200px;
-  height: 200px;
+.play {
+  position: relative;
+  align-self: center;
+  width: 176px;
+  height: 176px;
   border-radius: 50%;
+  margin: 6px 0 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin: 6px 0 4px;
-  background: linear-gradient(145deg, var(--play-a), var(--play-b));
+  color: #fff;
+  background: linear-gradient(150deg, var(--primary-bright), var(--primary));
   box-shadow:
-    0 14px 40px rgba(255, 91, 138, 0.35),
-    inset 0 2px 6px rgba(255, 255, 255, 0.25);
+    0 18px 44px var(--primary-glow),
+    inset 0 2px 8px rgba(255, 255, 255, 0.28),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.18);
 }
 
-.btn-play:active,
-.btn-play.tapped {
-  transform: scale(0.92);
-  box-shadow:
-    0 6px 22px rgba(255, 91, 138, 0.45),
-    inset 0 2px 6px rgba(255, 255, 255, 0.25);
+/* Soft pulsing ring behind the play button. */
+.play-glow {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(139, 124, 255, 0.35);
+  animation: pulse 2.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.55; }
+  50%      { transform: scale(1.06); opacity: 0; }
 }
 
-.btn-play .icon-play {
+.play-icon {
   line-height: 0;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28));
+  transform: translateX(2px); /* optically centre the triangle */
 }
-
-.btn-play-label {
-  font-size: 0.95rem;
+.play-label {
+  font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.3px;
-  opacity: 0.95;
 }
 
-/* ---- Rows of secondary buttons ----------------------------------------- */
-
-.row {
-  display: flex;
-  gap: 14px;
-  width: 100%;
+.play:active,
+.play.tapped {
+  transform: scale(0.93);
+  box-shadow:
+    0 8px 26px var(--primary-glow),
+    inset 0 2px 8px rgba(255, 255, 255, 0.28);
 }
 
-.row-seek .btn-seek {
-  flex: 1;
-  height: 92px;
+/* ---- Rows --------------------------------------------------------------- */
+
+.row { display: flex; gap: 12px; }
+.row.two > * { flex: 1; }
+
+/* ---- Seek tiles --------------------------------------------------------- */
+
+.tile {
+  height: 96px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+.tile-icon { color: var(--primary-bright); margin-bottom: 2px; }
+.tile-num  { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.3px; }
+.tile-sub  { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; }
+
+.tile:active,
+.tile.tapped {
+  transform: scale(0.95);
+  background: var(--surface-2);
+  border-color: rgba(139, 124, 255, 0.45);
 }
 
-.seek-num {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
+/* ---- Labelled block (speed) -------------------------------------------- */
 
-.seek-sub {
-  font-size: 0.78rem;
-  color: var(--text-dim);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.btn-wide {
-  flex: 1;
-  height: 64px;
-  font-size: 1.05rem;
+.block { display: flex; flex-direction: column; gap: 8px; }
+.block-label {
+  font-size: 0.72rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-dim);
+  padding-left: 4px;
+}
+
+/* ---- Segmented speed control ------------------------------------------- */
+
+.segment {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.seg {
+  flex: 1;
+  padding: 13px 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.seg:active { transform: scale(0.94); }
+
+/* Active speed uses the SECONDARY colour. */
+.seg.is-active {
+  color: #04130F;
+  background: linear-gradient(150deg, var(--secondary-bright), var(--secondary));
+  box-shadow: 0 6px 16px var(--secondary-glow);
+}
+
+/* ---- Full-width bars (captions / next / fullscreen) -------------------- */
+
+.bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
+.bar-text { font-size: 1.02rem; font-weight: 600; }
+.bar-left { display: flex; align-items: center; gap: 12px; }
+.bar:active,
+.bar.tapped { transform: scale(0.97); background: var(--surface-2); }
 
-/* "Next Episode" gets a subtle accent tint to stand out a little. */
-.row:not(.row-seek) .btn-wide:not(.btn-ghost) {
-  background: linear-gradient(145deg, #2a3160, #20254a);
-  border-color: rgba(91, 124, 255, 0.4);
+/* "Next Episode" is the secondary call-to-action → primary tint. */
+.bar-accent {
+  background: linear-gradient(150deg, rgba(110, 91, 242, 0.22), rgba(110, 91, 242, 0.10));
+  border-color: rgba(139, 124, 255, 0.5);
+  color: var(--text);
 }
+.bar-accent svg { color: var(--primary-bright); }
 
-.btn-ghost {
+/* Fullscreen is quieter (ghost). */
+.bar-ghost {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--line);
   color: var(--text-dim);
   box-shadow: none;
 }
+.bar-ghost:active,
+.bar-ghost.tapped { background: rgba(255, 255, 255, 0.04); }
 
-.btn-ghost:active,
-.btn-ghost.tapped {
-  background: rgba(255, 255, 255, 0.06);
+/* ---- Captions badge + toggle switch ------------------------------------ */
+
+.cc-badge {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  border: 1.5px solid var(--text-dim);
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.switch {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  flex: none;
+}
+.switch-knob {
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transform: translateY(-50%);
+  transition: transform 0.22s cubic-bezier(0.4, 0.0, 0.2, 1), background 0.2s ease;
+}
+
+/* Captions ON → SECONDARY colour. */
+.bar-toggle.is-on { border-color: rgba(31, 210, 166, 0.5); }
+.bar-toggle.is-on .switch {
+  background: linear-gradient(150deg, var(--secondary-bright), var(--secondary));
+  border-color: transparent;
+}
+.bar-toggle.is-on .switch-knob {
+  transform: translateY(-50%) translateX(22px);
+  background: #04130F;
+}
+.bar-toggle.is-on .cc-badge {
+  color: var(--secondary-bright);
+  border-color: var(--secondary-bright);
+  background: rgba(31, 210, 166, 0.12);
 }
 
 /* ---- Bottom status indicator ------------------------------------------- */
 
 .status {
-  margin-top: 6px;
+  margin-top: 4px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: var(--text-dim);
   min-height: 22px;
 }
-
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--text-dim);
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Status colours, toggled by app.js via classes on the .status element. */
-.status.is-ok .status-dot {
-  background: var(--ok);
-  box-shadow: 0 0 10px var(--ok);
-}
-.status.is-ok .status-text { color: var(--ok); }
+/* Sending → PRIMARY, success → SECONDARY, error → muted red.
+   We deliberately keep error as a neutral-ish red so the two brand colours
+   stay dominant. */
+.status.is-sending .status-dot { background: var(--primary-bright); box-shadow: 0 0 10px var(--primary-glow); }
+.status.is-sending .status-text { color: var(--primary-bright); }
 
-.status.is-err .status-dot {
-  background: var(--err);
-  box-shadow: 0 0 10px var(--err);
-}
-.status.is-err .status-text { color: var(--err); }
+.status.is-ok .status-dot { background: var(--secondary); box-shadow: 0 0 10px var(--secondary-glow); }
+.status.is-ok .status-text { color: var(--secondary-bright); }
 
-.status.is-sending .status-dot {
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent);
-}
+.status.is-err .status-dot { background: #FF6B7A; box-shadow: 0 0 10px rgba(255, 107, 122, 0.5); }
+.status.is-err .status-text { color: #FF8A95; }
