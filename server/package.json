@@ -1,0 +1,10 @@
+{
+  "name": "watchsomuch-lan-remote-server",
+  "version": "1.0.0",
+  "description": "Tiny dependency-free relay server for the WatchSoMuch LAN Remote.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT"
+}

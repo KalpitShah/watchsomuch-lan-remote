@@ -1,0 +1,223 @@
+/* ============================================================
+   WatchSoMuch Remote — styles
+   Dark theme, high-contrast buttons, smooth tap animations.
+   Pure CSS, no frameworks.
+   ============================================================ */
+
+:root {
+  --bg-top: #11142a;
+  --bg-bottom: #070810;
+  --accent: #5b7cff;        /* primary blue/purple accent */
+  --accent-glow: #7c5bff;
+  --play-a: #ff5b8a;        /* play button gradient */
+  --play-b: #ff8a3d;
+  --surface: #1a1e36;       /* button background */
+  --surface-hi: #232844;    /* button background (pressed/hover) */
+  --text: #f2f4ff;
+  --text-dim: #8a90b8;
+  --ok: #3ddc84;
+  --err: #ff5b6e;
+  --radius: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* remove ugly grey flash on mobile */
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: radial-gradient(120% 90% at 50% 0%, var(--bg-top) 0%, var(--bg-bottom) 70%);
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  /* Respect phone notches / home indicators. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.remote {
+  width: 100%;
+  max-width: 460px;
+  padding: 28px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  margin: 6px 0 8px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-align: center;
+}
+
+/* ---- Generic button look & tap feedback -------------------------------- */
+
+.btn {
+  border: none;
+  outline: none;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+  /* Smooth scale + shadow animation on tap. */
+  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* The brief highlight + squish when a button is pressed. */
+.btn:active,
+.btn.tapped {
+  transform: scale(0.94);
+  background: var(--surface-hi);
+}
+
+/* ---- The big Play / Pause button --------------------------------------- */
+
+.btn-play {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0 4px;
+  background: linear-gradient(145deg, var(--play-a), var(--play-b));
+  box-shadow:
+    0 14px 40px rgba(255, 91, 138, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25);
+}
+
+.btn-play:active,
+.btn-play.tapped {
+  transform: scale(0.92);
+  box-shadow:
+    0 6px 22px rgba(255, 91, 138, 0.45),
+    inset 0 2px 6px rgba(255, 255, 255, 0.25);
+}
+
+.btn-play .icon-play {
+  line-height: 0;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+
+.btn-play-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  opacity: 0.95;
+}
+
+/* ---- Rows of secondary buttons ----------------------------------------- */
+
+.row {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.row-seek .btn-seek {
+  flex: 1;
+  height: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.seek-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.seek-sub {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.btn-wide {
+  flex: 1;
+  height: 64px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* "Next Episode" gets a subtle accent tint to stand out a little. */
+.row:not(.row-seek) .btn-wide:not(.btn-ghost) {
+  background: linear-gradient(145deg, #2a3160, #20254a);
+  border-color: rgba(91, 124, 255, 0.4);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-dim);
+  box-shadow: none;
+}
+
+.btn-ghost:active,
+.btn-ghost.tapped {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Bottom status indicator ------------------------------------------- */
+
+.status {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  min-height: 22px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Status colours, toggled by app.js via classes on the .status element. */
+.status.is-ok .status-dot {
+  background: var(--ok);
+  box-shadow: 0 0 10px var(--ok);
+}
+.status.is-ok .status-text { color: var(--ok); }
+
+.status.is-err .status-dot {
+  background: var(--err);
+  box-shadow: 0 0 10px var(--err);
+}
+.status.is-err .status-text { color: var(--err); }
+
+.status.is-sending .status-dot {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}

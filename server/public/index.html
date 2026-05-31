@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Make the page sit nicely on a phone screen and disable pinch-zoom so
+       it feels like a native remote app rather than a web page. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b0d17" />
+  <title>WatchSoMuch Remote</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="remote">
+    <h1 class="title">WatchSoMuch Remote</h1>
+
+    <!-- The big, most-important button. Play / Pause toggle. -->
+    <button class="btn btn-play" data-action="playpause" aria-label="Play or Pause">
+      <span class="icon-play" aria-hidden="true">
+        <!-- We show both a play triangle and pause bars; CSS decides which.
+             Here we just show a universal play/pause glyph. -->
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="currentColor">
+          <path d="M8 5v14l11-7z" class="glyph-play" />
+          <g class="glyph-pause" style="display:none">
+            <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+            <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+          </g>
+        </svg>
+      </span>
+      <span class="btn-play-label">Play / Pause</span>
+    </button>
+
+    <!-- Seek backward / forward, side by side. -->
+    <div class="row row-seek">
+      <button class="btn btn-seek" data-action="seek-back" aria-label="Rewind 10 seconds">
+        <span class="seek-num">−10s</span>
+        <span class="seek-sub">Rewind</span>
+      </button>
+      <button class="btn btn-seek" data-action="seek-forward" aria-label="Forward 10 seconds">
+        <span class="seek-num">+10s</span>
+        <span class="seek-sub">Forward</span>
+      </button>
+    </div>
+
+    <!-- Next episode. -->
+    <div class="row">
+      <button class="btn btn-wide" data-action="next" aria-label="Next episode">
+        Next Episode ›
+      </button>
+    </div>
+
+    <!-- Fullscreen toggle. -->
+    <div class="row">
+      <button class="btn btn-wide btn-ghost" data-action="fullscreen" aria-label="Toggle fullscreen">
+        ⤢ Fullscreen
+      </button>
+    </div>
+
+    <!-- Bottom status indicator: shows whether the last command was delivered. -->
+    <div class="status" id="status" role="status" aria-live="polite">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-text" id="statusText">Ready</span>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

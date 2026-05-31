@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "WatchSoMuch LAN Remote",
+  "version": "1.0.0",
+  "description": "Lets you control the WatchSoMuch video player from your phone over your local network (LAN / hotspot).",
+
+  "permissions": [
+    "tabs",
+    "scripting",
+    "alarms"
+  ],
+
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+
+    "*://*.watchsomuch.to/*",
+    "*://*.watchsomuch.tv/*",
+    "*://*.watchsomuch.org/*",
+    "*://*.watchsomuch.net/*",
+    "*://*.watchsomuch.me/*",
+    "*://*.watchsomuch.com/*",
+    "*://*.watchsomuch.cc/*",
+    "*://*.watchsomuch.info/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  }
+}
