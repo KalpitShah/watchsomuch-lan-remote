@@ -1,0 +1,10 @@
+services:
+  remote:
+    build: ./server
+    image: watchsomuch-lan-remote
+    container_name: watchsomuch-lan-remote
+    # Publish 3000 on every host interface so phones on the same Wi-Fi / hotspot
+    # can reach it at  http://<this-laptop-LAN-IP>:3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
